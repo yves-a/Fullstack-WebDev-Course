@@ -1,12 +1,12 @@
 GET http://localhost:3001/api/persons/
 
 ###
-POST http://localhost:3001/api/persons HTTP/1.1
+POST https://floating-citadel-38949.herokuapp.com/api/persons/ HTTP/1.1
 content-type: application/json
 
 {
-    "name": "sample",
-    "number": "416"
+    "name": "s",
+    "number": "46"
 }
 
 ###
