@@ -21,13 +21,15 @@ const App = () => {
     personService
       .getAll()
       .then(response => {
-        setPersons(response.data)
+        setPersons(response)
       })
+      
   }, [])
   const namesToShow = showAll
     ? persons
     : persons.filter(person=>person.name.toLowerCase().includes(filterValue.toLowerCase()))
   
+    console.log(persons)
   const addName = (event) => {
     event.preventDefault()
     console.log('button clicked', event.target)
@@ -56,7 +58,7 @@ const App = () => {
           }, 3000)
       })
       .catch(error=>{
-          setNotification({message:`Imformation of ${nameObject.name} has already been removed from the server`, type:'error'})
+          setNotification({message:`Information of ${nameObject.name} has already been removed from the server`, type:'error'})
           setTimeout(()=>{
             setNotification(null)
           }, 3000)
@@ -70,11 +72,17 @@ const App = () => {
         setPersons(persons.concat(response.data))
         setNewName('')
         setNewNumber('')
-      })
-      setNotification({message:`Added ${nameObject.name}`, type:'noti'})
-      setTimeout(()=>{
+        setNotification({message:`Added ${nameObject.name}`, type:'noti'})
+        setTimeout(()=>{
         setNotification(null)
       }, 3000)
+      })
+      .catch(error=>{
+        setNotification({message:error.response.data.error, type:'error'})
+        setTimeout(()=>{
+          setNotification(null)
+        }, 3000)
+    })
       
     }
 
@@ -100,13 +108,11 @@ const App = () => {
   }
 
   const handleDelete = (event) => {
-    const id = parseInt(event.target.id)
-
     console.log(event.target.value)
     if (window.confirm(`Do you want to delete ${event.target.value}`)){
       personService
       .deletePerson(event.target.id)
-      .then(deletedPerson=>setPersons(persons.filter(person=>person.id !== id)))
+      .then(deletedPerson=>setPersons(persons.filter(person=>person.id !== event.target.id)))
       
       
   

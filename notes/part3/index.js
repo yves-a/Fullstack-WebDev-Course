@@ -1,7 +1,34 @@
 const express = require('express')
 const app = express()
-
+const Note = require('./models/note')
+require('dotenv').config()
 app.use(express.json())
+
+const mongoose = require('mongoose')
+
+
+const password = process.argv[2]
+console.log(password)
+const url =
+  `mongodb+srv://yalikalfic:${password}@cluster0.uywcy.mongodb.net/noteApp?retryWrites=true&w=majority`
+
+mongoose.connect(url)
+
+const noteSchema = new mongoose.Schema({
+  content: String,
+  date: Date,
+  important: Boolean,
+})
+
+noteSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
+const Note = mongoose.model('Note', noteSchema)
 
 let notes = [
     {
@@ -29,15 +56,10 @@ app.get('/', (request, response) => {
   })
   
 
-  app.get('/api/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const note = notes.find(note => note.id === id)
-    
-    if (note) {
-      response.json(note)
-    } else {
-      response.status(404).end()
-    }
+  app.get('/api/notes', (request, response) => {
+    Note.find({}).then(notes => {
+      response.json(notes)
+    })
   })
 
   app.delete('/api/notes/:id', (request, response) => {
@@ -76,7 +98,7 @@ app.get('/', (request, response) => {
   })
   
   
-const PORT = 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
   })
